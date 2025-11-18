@@ -8,7 +8,6 @@ app.use(cors());
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.IDFM_KEY;
 
-// URL officielle GTFS-RT Trip Updates, accessible avec simple clé PRIM
 const IDFM_TRIP_UPDATES =
   "https://prim.iledefrance-mobilites.fr/marketplace/gtfs-rt-trip-updates/v2/gtfs-rt-trip-updates";
 
@@ -25,5 +24,5 @@ app.get("/trip-updates", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log("Proxy IDFM en fonctionnement sur port " + PORT);
+  console.log("Proxy IDFM lancé sur port " + PORT);
 });
