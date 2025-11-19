@@ -3,26 +3,30 @@ import fetch from "node-fetch";
 import cors from "cors";
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.use(cors());
 
-const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.IDFM_KEY;
+app.get("/proxy", async (req, res) => {
+  const targetUrl = req.query.url;
 
-const IDFM_TRIP_UPDATES =
-  "https://prim.iledefrance-mobilites.fr/marketplace/gtfs-rt-trip-updates/v2/gtfs-rt-trip-updates";
+  if (!targetUrl) {
+    return res.status(400).json({ error: "Missing URL parameter" });
+  }
 
-app.get("/trip-updates", async (req, res) => {
   try {
-    const response = await fetch(`${IDFM_TRIP_UPDATES}?key=${API_KEY}`);
-    const buffer = await response.arrayBuffer();
+    const response = await fetch(targetUrl);
+    const data = await response.arrayBuffer();
 
-    res.setHeader("Content-Type", "application/octet-stream");
-    res.send(Buffer.from(buffer));
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Content-Type", response.headers.get("content-type"));
+    res.send(Buffer.from(data));
+  } catch (error) {
+    console.error("Proxy error:", error);
+    res.status(500).json({ error: "Failed to fetch target URL" });
   }
 });
 
 app.listen(PORT, () => {
-  console.log("Proxy IDFM lancé sur port " + PORT);
+  console.log("CORS Proxy running on port " + PORT);
 });
